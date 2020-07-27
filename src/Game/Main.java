@@ -3,7 +3,6 @@ package Game;
 import Game.Model.GameBoardModel;
 import Game.Model.QuestionCardModel;
 import Game.Views.GameBoardView;
-import Game.Views.QuestionCardView;
 import Game.Views.StartView;
 import javafx.application.Application;
 import javafx.scene.Scene;
