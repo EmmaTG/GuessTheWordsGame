@@ -1,5 +1,6 @@
 package Game.Views;
 
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -7,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -26,22 +28,58 @@ public class StartView {
         this.gridPane = new GridPane();
         this.gridPane.setAlignment(Pos.CENTER);
         this.nameFields = new ArrayList<>();
-        this.addPlayer = new Button("Add player (Max 4)");
+        this.addPlayer = new Button("Add team (Max 4)");
         this.done = new Button("Done");
         this.exit = new Button("Exit");
         this.buttons = new HBox(this.done, this.exit);
+        this.buttons.setAlignment(Pos.CENTER);
+        setAddPlayerStyle();
+        setDoneButtonStyle();
+        setExitButtonStyle();
+    }
+
+
+    private void setDoneButtonStyle(){
+        this.done.setStyle("-fx-background-color: rgb(127,255,0); -fx-border-color: black;" +
+                "-fx-text-fill: black; -fx-border-radius: 5; -fx-background-radius: 5");
+        HBox.setHgrow(this.done, Priority.ALWAYS);
+        this.done.maxWidth(Double.MAX_VALUE);
+        this.done.setMaxWidth(100);
+    }
+
+    private void setExitButtonStyle(){
+        this.exit.setStyle("-fx-background-color: rgb(128,0,255); -fx-border-color: black;" +
+                "-fx-text-fill: black; -fx-border-radius: 5; -fx-background-radius: 5");
+        HBox.setHgrow(this.exit, Priority.ALWAYS);
+        this.exit.maxWidth(Double.MAX_VALUE);
+        this.exit.setMaxWidth(100);
+    }
+
+    private void setAddPlayerStyle(){
+        this.addPlayer.setStyle("-fx-border-color: black;" +
+                "-fx-text-fill: black; -fx-border-radius: 5; -fx-background-radius: 5");
+        this.addPlayer.maxWidth(Double.MAX_VALUE);
+
     }
 
     public Scene getScene() {
-        Label welcomeLabel = new Label("Let's play 30 Seconds");
-        welcomeLabel.maxWidth(Double.MAX_VALUE);
+        Label welcomeLabel = new Label("Let's play!");
+        welcomeLabel.setStyle("-fx-font-size: 22; -fx-font-weight:bold");
+        welcomeLabel.setPrefWidth(300);
+        welcomeLabel.setAlignment(Pos.CENTER);
         this.gridPane.add(welcomeLabel,0,0);
-        this.gridPane.add(this.addPlayer,0,1);
-        Label newLabel = new Label("Name:");
+        this.gridPane.add(new Label(),0,1);
+        this.gridPane.add(this.addPlayer,0,2);
+        this.gridPane.add(new Label(),0,3);
+        Label newLabel = new Label("Team name:");
         newLabel.maxWidth(Double.MAX_VALUE);
-        this.gridPane.add(newLabel,0,2);
+        newLabel.setStyle("-fx-font-size: 14; -fx-font-weight:bold");
+        this.gridPane.add(newLabel,0,4);
         this.done.setDisable(true);
-        this.gridPane.add(this.buttons,0,3);
+        this.gridPane.add(this.buttons,0,5);
+        GridPane.setHalignment(this.addPlayer, HPos.CENTER);
+        GridPane.setHalignment(this.buttons, HPos.CENTER);
+
         return new Scene(gridPane);
     }
     public List<String> getPlayerNames(){
@@ -54,7 +92,7 @@ public class StartView {
         this.done.setDisable(true);
         TextField newTextField = new TextField();
         newTextField.maxWidth(Double.MAX_VALUE);
-        newTextField.setOnKeyPressed(e -> {
+        newTextField.setOnKeyReleased(e -> {
             if (emptyTextFields()){
                 this.done.setDisable(true);
             } else {

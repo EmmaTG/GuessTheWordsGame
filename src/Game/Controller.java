@@ -6,12 +6,17 @@ import Game.Model.QuestionCardModel;
 import Game.Views.GameBoardView;
 import Game.Views.QuestionCardView;
 import Game.Views.StartView;
+import javafx.geometry.HPos;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -24,7 +29,6 @@ public class Controller {
     private GameBoardView gameBoardView;
     private QuestionCardModel questionCardModel;
     private Stage stage;
-    private static int count =2;
 
     public Controller(StartView startView,
                       GameBoardView gameBoardView, GameBoardModel gameBoardModel,
@@ -49,13 +53,13 @@ public class Controller {
 
     private void addPlayer(){
         startView.getAddPlayer().setOnAction(addPlayerEvent ->{
-            if (count<6) {
-                count++;
-                GridPane startSceneGridPane = startView.getGridPane();
+            GridPane startSceneGridPane = startView.getGridPane();
+            if (startSceneGridPane.getRowCount()<22) {
                 HBox buttonsHbox = startView.getButtons();
-                startSceneGridPane.add(startView.addPlayerVBox(), 0, count);
+                System.out.println(startSceneGridPane.getRowCount());
+                startSceneGridPane.add(startView.addPlayerVBox(), 0, startSceneGridPane.getRowCount()+1);
                 startSceneGridPane.getChildren().remove(buttonsHbox);
-                startSceneGridPane.add(buttonsHbox, 0, count + 1);
+                startSceneGridPane.add(buttonsHbox, 0, startSceneGridPane.getRowCount()+2);
                 stage.setHeight(stage.getHeight() + 26);
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -90,16 +94,20 @@ public class Controller {
             } else {
                 // Create question card
                 Stage newStage = new Stage();
-                QuestionCardView questionCardView = new QuestionCardView();
                 List<String> words = questionCardModel.getWords();
+                QuestionCardView questionCardView = new QuestionCardView(words);
                 questionCardModel.resetCounters();
                 for (int i=0; i<words.size(); i++) {
                     ToggleButton wordToggle = questionCardView.getToggleButtons(words.get(i));
+                    String originalStyle = wordToggle.getStyle();
                     wordToggle.setOnAction((tog) -> {
                         if (wordToggle.isSelected()) {
                             questionCardModel.correct();
+                            wordToggle.setStyle("-fx-background-color: grey ; -fx-background-radius: 5; " +
+                                    "-fx-border-color: black; -fx-border-radius: 5");
                         } else {
                             questionCardModel.incorrect();
+                            wordToggle.setStyle(originalStyle);
                         }
                     });
                 }
@@ -112,11 +120,14 @@ public class Controller {
                         currentPlayer = 0;
                     }
                     gameBoardModel.setCurrentPlayer(listOfPlayers.get(currentPlayer));
+                    gameBoardView.getPlayButton().setDisable(false);
                     showBoard();
                 });
 
                 Scene scene = questionCardView.getView();
+                gameBoardView.getPlayButton().setDisable(true);
                 newStage.setScene(scene);
+                newStage.setAlwaysOnTop(true);
                 newStage.showAndWait();
             }
         });
@@ -146,8 +157,8 @@ public class Controller {
         GridPane gridPane = gameBoardView.getGameBoard();
         Scene scene = new Scene(gridPane);
         stage.setScene(scene);
-        stage.setHeight(1000);
-        stage.setWidth(1000);
+        stage.setHeight(700);
+        stage.setWidth(900);
     }
 
     private Alert finishedAlert(Player player){

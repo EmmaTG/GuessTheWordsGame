@@ -2,9 +2,12 @@ package Game.Views;
 
 import Game.Model.Player;
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.text.TextAlignment;
 
 import java.util.*;
 
@@ -13,14 +16,30 @@ public class GameBoardView {
     private List<List<Integer>> boardPositions = new ArrayList<>();
     private static GridPane boardGridPane;
     private Button playButton = new Button();
+    private boolean blue = true;
 
     public GameBoardView() {
         setGameBoardPositions();
+        setPlayButtonStyle();
         boardGridPane = new GridPane();
-        boardPositions.forEach( el -> boardGridPane.add(getBorderLabel(),el.get(0), el.get(1)));
+        boardPositions.forEach( el -> {
+            if (boardPositions.indexOf(el) == 0){
+                boardGridPane.add(getBorderLabel("START"), el.get(0), el.get(1));
+            } else if (boardPositions.indexOf(el) == (boardPositions.size()-1)){
+                boardGridPane.add(getBorderLabel("FINISH"), el.get(0), el.get(1));
+            } else {
+                boardGridPane.add(getBorderLabel(""), el.get(0), el.get(1));
+            }
+        });
         boardGridPane.add(playButton,4,3);
         GridPane.setHalignment(playButton,HPos.CENTER);
 
+    }
+
+    private void setPlayButtonStyle(){
+        playButton.setStyle("-fx-font-weight:bold; -fx-font-size: 22; -fx-text-fill: black; " +
+                "-fx-border-color: black; -fx-border-radius: 5;" +
+                "-fx-background-color: rgb(128,0,255); -fx-background-radius: 5");
     }
 
     public GridPane getGameBoard(){
@@ -39,11 +58,18 @@ public class GameBoardView {
         }
     }
     
-    private Label getBorderLabel(){
-        Label label = new Label("board square");
+    private Label getBorderLabel(String text){
+        Label label = new Label(text);
+        label.setAlignment(Pos.CENTER);
         label.setPrefWidth(100);
         label.setPrefHeight(100);
-        label.setStyle("-fx-border-color: black");
+        if (blue) {
+            blue = false;
+            label.setStyle("-fx-border-color: black; -fx-background-color: rgba(0,128,255); -fx-text-fill: black; -fx-font-weight: bold");
+        } else {
+            blue = true;
+            label.setStyle("-fx-border-color: black; -fx-background-color: rgba(255,255,0); -fx-text-fill: black; -fx-font-weight: bold");
+        }
         return label;
     }
 

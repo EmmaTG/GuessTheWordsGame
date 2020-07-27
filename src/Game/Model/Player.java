@@ -62,10 +62,11 @@ public class Player {
     }
 
     private Label getMarker(String color){
-        Label marker = new Label();
+        Label marker = new Label(this.name.substring(0,1).toUpperCase());
+        marker.setAlignment(Pos.CENTER);
         marker.setPrefWidth(25);
         marker.setPrefHeight(25);
-        marker.setStyle(String.format("-fx-border-color: black; -fx-background-color: %s",color));
+        marker.setStyle(String.format("-fx-border-color: black; -fx-background-color: %s; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: black",color));
         return marker;
     }
 
