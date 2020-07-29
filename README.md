@@ -1,0 +1,1 @@
+This is a game similar to 30 seconds. Up to 4 teams can play at time. The aim is to get your fellow teams mates to guess teh five words on the card. Th efirst team to the finish line wins. Run Main.java file to play. 
