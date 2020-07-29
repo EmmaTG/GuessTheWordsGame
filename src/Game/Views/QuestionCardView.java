@@ -37,6 +37,7 @@ public class QuestionCardView {
 
     public ToggleButton getToggleButtons(String word){
         ToggleButton toggleButton = new ToggleButton(word);
+        toggleButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         String color = "white";
         if(blue){
             color = "rgba(0,128,255)";
@@ -47,7 +48,7 @@ public class QuestionCardView {
         }
         toggleButton.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 5; " +
                 "-fx-border-color: black; -fx-border-radius: 5");
-        toggleButton.setPrefWidth(200);
+//        toggleButton.setPrefWidth(200);
         toggleButton.setPrefHeight(25);
         if (gridPane.getChildren().isEmpty()){
             gridPane.add(toggleButton,0,2);

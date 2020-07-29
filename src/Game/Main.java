@@ -2,11 +2,19 @@ package Game;
 
 import Game.Model.GameBoardModel;
 import Game.Model.QuestionCardModel;
+import Game.Model.WordDataSource;
 import Game.Views.GameBoardView;
 import Game.Views.StartView;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.sql.*;
+import java.util.Scanner;
 
 public class Main extends Application {
 
@@ -30,8 +38,13 @@ public class Main extends Application {
         stage.showAndWait();
     }
 
+    @Override
+    public void stop() throws Exception {
+        WordDataSource.getInstance().close();
+    }
 
     public static void main(String[] args) {
         launch(args);
     }
+
 }

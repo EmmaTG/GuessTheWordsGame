@@ -37,7 +37,7 @@ public class GameBoardView {
     }
 
     private void setPlayButtonStyle(){
-        playButton.setStyle("-fx-font-weight:bold; -fx-font-size: 22; -fx-text-fill: black; " +
+        playButton.setStyle("-fx-font-weight:bold; -fx-font-size: 15; -fx-text-fill: black; " +
                 "-fx-border-color: black; -fx-border-radius: 5;" +
                 "-fx-background-color: rgb(128,0,255); -fx-background-radius: 5");
     }

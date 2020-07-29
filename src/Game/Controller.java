@@ -3,6 +3,7 @@ package Game;
 import Game.Model.GameBoardModel;
 import Game.Model.Player;
 import Game.Model.QuestionCardModel;
+import Game.Model.WordDataSource;
 import Game.Views.GameBoardView;
 import Game.Views.QuestionCardView;
 import Game.Views.StartView;
@@ -16,6 +17,8 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -29,6 +32,7 @@ public class Controller {
     private GameBoardView gameBoardView;
     private QuestionCardModel questionCardModel;
     private Stage stage;
+    private List<Integer> dataBaseIDs = new ArrayList<>();
 
     public Controller(StartView startView,
                       GameBoardView gameBoardView, GameBoardModel gameBoardModel,
@@ -39,9 +43,11 @@ public class Controller {
         this.gameBoardView = gameBoardView;
         this.questionCardModel = questionCardModel;
         this.stage = stage;
+        this.dataBaseIDs = WordDataSource.getInstance().getIds();
     }
 
     public void init(){
+        WordDataSource.getInstance().open();
         setEventHandlers();
     }
 
@@ -49,22 +55,25 @@ public class Controller {
                 addPlayer();
                 setExitButton();
                 setDoneButton();
+                setRemovePlayer();
     }
 
     private void addPlayer(){
         startView.getAddPlayer().setOnAction(addPlayerEvent ->{
-            GridPane startSceneGridPane = startView.getGridPane();
-            if (startSceneGridPane.getRowCount()<22) {
-                HBox buttonsHbox = startView.getButtons();
-                System.out.println(startSceneGridPane.getRowCount());
-                startSceneGridPane.add(startView.addPlayerVBox(), 0, startSceneGridPane.getRowCount()+1);
-                startSceneGridPane.getChildren().remove(buttonsHbox);
-                startSceneGridPane.add(buttonsHbox, 0, startSceneGridPane.getRowCount()+2);
-                stage.setHeight(stage.getHeight() + 26);
+            if (startView.getNameFields().size()<4) {
+                startView.addPlayerFields(stage);
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setHeaderText("Sorry, Max of four players");
                 alert.show();
+            }
+        });
+    }
+
+    public void setRemovePlayer() {
+        startView.getRemovePlayer().setOnAction((e) -> {
+            if (startView.getvBoxFields().size()>1) {
+                startView.removeFields(stage);
             }
         });
     }
@@ -87,6 +96,7 @@ public class Controller {
         gameBoardView.getPlayButton().setOnAction((e) -> {
             if (gameBoardModel.getGameFinished()){
                 listOfPlayers.forEach( el -> el.setPosition(0));
+                gameBoardModel.resetStyles();
                 gameBoardModel.setCurrentPlayer(listOfPlayers.get(0));
                 gameBoardModel.setGameFinished(false);
                 gameBoardView.getPlayButton().setText("Play");
@@ -94,6 +104,7 @@ public class Controller {
             } else {
                 // Create question card
                 Stage newStage = new Stage();
+                questionCardModel.getRandomIds(dataBaseIDs);
                 List<String> words = questionCardModel.getWords();
                 QuestionCardView questionCardView = new QuestionCardView(words);
                 questionCardModel.resetCounters();
@@ -113,13 +124,15 @@ public class Controller {
                 }
                 questionCardView.setWords(words);
                 questionCardView.getDoneButton().setOnAction((e1) -> {
+                    // Change to the next players turn.
                     newStage.close();
-                    gameBoardModel.getCurrentPlayer().moveSpaces(questionCardModel.getCorrect());
-                    int currentPlayer = listOfPlayers.indexOf(gameBoardModel.getCurrentPlayer()) + 1;
-                    if ((currentPlayer) == listOfPlayers.size()) {
-                        currentPlayer = 0;
+                    Player currentPlayer = gameBoardModel.getCurrentPlayer();
+                    currentPlayer.moveSpaces(questionCardModel.getCorrect());
+                    int currentPlayerIndex = listOfPlayers.indexOf(currentPlayer) + 1;
+                    if ((currentPlayerIndex) == listOfPlayers.size()) {
+                        currentPlayerIndex = 0;
                     }
-                    gameBoardModel.setCurrentPlayer(listOfPlayers.get(currentPlayer));
+                    gameBoardModel.setCurrentPlayer(listOfPlayers.get(currentPlayerIndex));
                     gameBoardView.getPlayButton().setDisable(false);
                     showBoard();
                 });
@@ -133,6 +146,7 @@ public class Controller {
         });
     }
 
+
     private void showBoard(){
         List<List<Integer>> gameBoardPositions = gameBoardView.getBoardPositions();
         List<Player> listOfPlayers = gameBoardModel.getListOfPlayers();
@@ -141,9 +155,8 @@ public class Controller {
         playButton.setText("Play");
         listOfPlayers.forEach((el) -> {
             gameBoardView.addMarkers(el);
-            if (el.getPosition()>=(gameBoardPositions.size()-1)){
-                System.out.println("Game over");
-                playButton.setText("New Game");
+            if (el.getPosition()>=(gameBoardPositions.size()-30)){
+                playButton.setText("New\nGame");
                 finishedAlert(el).show();
                 gameBoardModel.setGameFinished(true);
             }

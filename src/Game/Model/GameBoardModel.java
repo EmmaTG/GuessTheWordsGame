@@ -19,7 +19,14 @@ public class GameBoardModel {
     }
 
     public void setCurrentPlayer(Player currentPlayer) {
+        currentPlayer.setCurrentPlayerStyle();
         this.currentPlayer = currentPlayer;
+    }
+
+    public void resetStyles(){
+        for (Player player: listOfPlayers){
+            player.setDormantPlayerStyle();
+        }
     }
 
     public Player getCurrentPlayer() {
