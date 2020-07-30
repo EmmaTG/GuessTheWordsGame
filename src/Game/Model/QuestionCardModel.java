@@ -1,5 +1,7 @@
 package Game.Model;
 
+import java.awt.*;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +38,6 @@ public class QuestionCardModel {
             availableIDs.remove(index);
             }
         }
-
 
     public void setWords(List<String> words) {
         this.words = words;
