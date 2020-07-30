@@ -86,7 +86,6 @@ public class QuestionCardView {
 
         Label infoLabel = new Label();
         word = word.replaceAll(" ", "_");
-        System.out.println(word);
         String urlRequest = "https://en.wikipedia.org/api/rest_v1/page/summary/"+ word;
         String result = apiRequest(urlRequest);
         JSONObject jObj = getJsonArrayResults(result);
