@@ -1,6 +1,8 @@
 package Game.Views;
 
 import javafx.beans.value.ChangeListener;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -54,9 +56,15 @@ public class QuestionCardView {
     }
 
     public ToggleButton getToggleButtons(String word){
+        Label queryLabel = new Label("?");
+        queryLabel.setStyle("-fx-border-radius:20; -fx-border-color: black; -fx-font-weight: bold; -fx-background-radius: 20");
+        queryLabel.setAlignment(Pos.CENTER);
+        queryLabel.setPrefWidth(20);
+        new Thread(() -> hoverButton(queryLabel,word)).start();
+
         ToggleButton toggleButton = new ToggleButton(word);
         toggleButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        String color = "white";
+        String color;
         if(blue){
             color = "rgba(0,128,255)";
             blue = false;
@@ -67,11 +75,6 @@ public class QuestionCardView {
         toggleButton.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 5; " +
                 "-fx-border-color: black; -fx-border-radius: 5");
         toggleButton.setPrefHeight(25);
-        Button queryLabel = new Button("?");
-        queryLabel.setStyle("-fx-border-radius:20; -fx-border-color: black; -fx-font-weight: bold; -fx-background-radius: 20");
-        queryLabel.setAlignment(Pos.CENTER);
-        queryLabel.setPrefWidth(20);
-        hoverButton(queryLabel,word);
         HBox toggleHbox = new HBox(toggleButton,queryLabel);
         HBox.setHgrow(toggleButton, Priority.ALWAYS);
         if (gridPane.getChildren().isEmpty()){
@@ -82,31 +85,32 @@ public class QuestionCardView {
         return toggleButton;
     }
 
-    private void hoverButton(Button query,String word){
+    private void hoverButton(Label query,String word){
 
         Label infoLabel = new Label();
         word = word.replaceAll(" ", "_");
         String urlRequest = "https://en.wikipedia.org/api/rest_v1/page/summary/"+ word;
-        String result = apiRequest(urlRequest);
-        JSONObject jObj = getJsonArrayResults(result);
-        infoLabel.setText("From Wikipedia:\n" + jObj.get("extract").toString());
-        infoLabel.setWrapText(true);
-        StackPane stickyNotesPane = new StackPane(infoLabel);
-        stickyNotesPane.setPrefSize(200, 200);
-        stickyNotesPane.setStyle("-fx-background-color: rgb(127,255,0);");
-        Popup popup = new Popup();
-        popup.getContent().add(stickyNotesPane);
+//                Thread.sleep(1000);
+                String result = apiRequest(urlRequest);
+                JSONObject jObj = getJsonArrayResults(result);
+            infoLabel.setText("From Wikipedia:\n" + jObj.get("extract").toString());
+            infoLabel.setWrapText(true);
+            StackPane stickyNotesPane = new StackPane(infoLabel);
+            stickyNotesPane.setPrefSize(200, 200);
+            stickyNotesPane.setStyle("-fx-background-color: rgb(127,255,0);");
+            Popup popup = new Popup();
+            popup.getContent().add(stickyNotesPane);
 
-        query.hoverProperty().addListener((obs, oldVal, newValue) -> {
-            if (newValue) {
-                Bounds bnds = query.localToScreen(query.getLayoutBounds());
-                double x = bnds.getMinX() + (query.getWidth());
-                double y = bnds.getMinY() - (stickyNotesPane.getHeight()/2);
-                popup.show(query, x, y);
-            } else {
-                popup.hide();
-            }
-        });
+            query.hoverProperty().addListener((obs, oldVal, newValue) -> {
+                if (newValue) {
+                    Bounds bnds = query.localToScreen(query.getLayoutBounds());
+                    double x = bnds.getMinX() + (query.getWidth());
+                    double y = bnds.getMinY() - (stickyNotesPane.getHeight()/2);
+                    popup.show(query, x, y);
+                } else {
+                    popup.hide();
+                }
+            });
     }
 
     private static JSONObject getJsonArrayResults(String readString) {
