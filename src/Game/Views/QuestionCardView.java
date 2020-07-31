@@ -36,16 +36,19 @@ public class QuestionCardView {
     private GridPane gridPane;
     private List<String> words;
     private Button doneButton = new Button("Done");
-    private  static boolean blue = true;
+    private static boolean blue = true;
+    private List<ToggleButton> listOfToggles;
+    private Label instructions;
 
 
     public QuestionCardView(List<String> words) {
         this.gridPane = new GridPane();
         this.words = words;
+        this.listOfToggles = new ArrayList<>();
         setDoneButtonStyle();
     }
 
-    private void setDoneButtonStyle(){
+    private void setDoneButtonStyle() {
         this.doneButton.setStyle("-fx-font-weight:bold; -fx-font-size: 16; -fx-text-fill: black; " +
                 "-fx-border-color: black; -fx-border-radius: 5;" +
                 "-fx-background-color: rgb(128,0,255); -fx-background-radius: 5");
@@ -55,17 +58,17 @@ public class QuestionCardView {
         this.words = words;
     }
 
-    public ToggleButton getToggleButtons(String word){
+    public ToggleButton getToggleButtons(String word) {
         Label queryLabel = new Label("?");
         queryLabel.setStyle("-fx-border-radius:20; -fx-border-color: black; -fx-font-weight: bold; -fx-background-radius: 20");
         queryLabel.setAlignment(Pos.CENTER);
         queryLabel.setPrefWidth(20);
-        new Thread(() -> hoverButton(queryLabel,word)).start();
+        new Thread(() -> hoverButton(queryLabel, word)).start();
 
         ToggleButton toggleButton = new ToggleButton(word);
         toggleButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         String color;
-        if(blue){
+        if (blue) {
             color = "rgba(0,128,255)";
             blue = false;
         } else {
@@ -75,42 +78,42 @@ public class QuestionCardView {
         toggleButton.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 5; " +
                 "-fx-border-color: black; -fx-border-radius: 5");
         toggleButton.setPrefHeight(25);
-        HBox toggleHbox = new HBox(toggleButton,queryLabel);
+        HBox toggleHbox = new HBox(toggleButton, queryLabel);
         HBox.setHgrow(toggleButton, Priority.ALWAYS);
-        if (gridPane.getChildren().isEmpty()){
-            gridPane.add(toggleHbox,0,2);
+        if (gridPane.getChildren().isEmpty()) {
+            gridPane.add(toggleHbox, 0, 2);
         } else {
-            gridPane.add(toggleHbox,0,gridPane.getRowCount());
+            gridPane.add(toggleHbox, 0, gridPane.getRowCount());
         }
+        listOfToggles.add(toggleButton);
         return toggleButton;
     }
 
-    private void hoverButton(Label query,String word){
+    private void hoverButton(Label query, String word) {
 
         Label infoLabel = new Label();
         word = word.replaceAll(" ", "_");
-        String urlRequest = "https://en.wikipedia.org/api/rest_v1/page/summary/"+ word;
-//                Thread.sleep(1000);
-                String result = apiRequest(urlRequest);
-                JSONObject jObj = getJsonArrayResults(result);
-            infoLabel.setText("From Wikipedia:\n" + jObj.get("extract").toString());
-            infoLabel.setWrapText(true);
-            StackPane stickyNotesPane = new StackPane(infoLabel);
-            stickyNotesPane.setPrefSize(200, 200);
-            stickyNotesPane.setStyle("-fx-background-color: rgb(127,255,0);");
-            Popup popup = new Popup();
-            popup.getContent().add(stickyNotesPane);
+        String urlRequest = "https://en.wikipedia.org/api/rest_v1/page/summary/" + word;
+        String result = apiRequest(urlRequest);
+        JSONObject jObj = getJsonArrayResults(result);
+        infoLabel.setText("From Wikipedia:\n" + jObj.get("extract").toString());
+        infoLabel.setWrapText(true);
+        StackPane stickyNotesPane = new StackPane(infoLabel);
+        stickyNotesPane.setPrefSize(200, 200);
+        stickyNotesPane.setStyle("-fx-background-color: rgb(127,255,0);");
+        Popup popup = new Popup();
+        popup.getContent().add(stickyNotesPane);
 
-            query.hoverProperty().addListener((obs, oldVal, newValue) -> {
-                if (newValue) {
-                    Bounds bnds = query.localToScreen(query.getLayoutBounds());
-                    double x = bnds.getMinX() + (query.getWidth());
-                    double y = bnds.getMinY() - (stickyNotesPane.getHeight()/2);
-                    popup.show(query, x, y);
-                } else {
-                    popup.hide();
-                }
-            });
+        query.hoverProperty().addListener((obs, oldVal, newValue) -> {
+            if (newValue) {
+                Bounds bnds = query.localToScreen(query.getLayoutBounds());
+                double x = bnds.getMinX() + (query.getWidth());
+                double y = bnds.getMinY() - (stickyNotesPane.getHeight() / 2);
+                popup.show(query, x, y);
+            } else {
+                popup.hide();
+            }
+        });
     }
 
     private static JSONObject getJsonArrayResults(String readString) {
@@ -143,35 +146,35 @@ public class QuestionCardView {
         return null;
     }
 
-    private static String createAPIRequest(int noOfQuestions, int categoryID, String difficulty) {
-        return String.format("https://opentdb.com/api.php?amount=%d&category=%d&difficulty=%s", noOfQuestions, categoryID, difficulty);
-    }
-
-    public static String createAPIRequest(int noOfQuestions, int categoryID) {
-        return String.format("https://opentdb.com/api.php?amount=%d&category=%d", noOfQuestions, categoryID);
-    }
-
-    private static String createAPIRequest(int noOfQuestions) {
-        return String.format("https://opentdb.com/api.php?amount=%d", noOfQuestions);
-    }
-
-    public Scene getView(){
+    public Scene getView() {
         Label questionHeading = new Label("Questions");
         questionHeading.setStyle("-fx-font-size: 22; -fx-font-weight: bold");
-        gridPane.add(questionHeading,0,0);
-        gridPane.add(new Label(),0,1);
-        Label instructions = new Label("Click on the ones your team \n guess correctly");
+        gridPane.add(questionHeading, 0, 0);
+        gridPane.add(new Label("You have 30 seconds to guess all 5 words on the card"), 0, 1);
+        instructions = new Label("Click on the ones your team \n guess correctly");
         instructions.setTextAlignment(TextAlignment.CENTER);
-        gridPane.add(new Label(),0,gridPane.getRowCount());
-        gridPane.add(instructions,0,gridPane.getRowCount());
-        gridPane.add(doneButton,0,gridPane.getRowCount());
+        gridPane.add(new Label(), 0, gridPane.getRowCount());
+        gridPane.add(instructions, 0, gridPane.getRowCount());
+        gridPane.add(doneButton, 0, gridPane.getRowCount());
         GridPane.setHalignment(doneButton, HPos.CENTER);
-        GridPane.setHalignment(questionHeading,HPos.CENTER);
-        GridPane.setHalignment(instructions,HPos.CENTER);
+        GridPane.setHalignment(questionHeading, HPos.CENTER);
+        GridPane.setHalignment(instructions, HPos.CENTER);
         return new Scene(gridPane);
+    }
+
+    public void timesUp(){
+        gridPane.add(new Label("TIME'S UP!!"), 0, 1);
+    }
+
+    public Label getInstructions() {
+        return instructions;
     }
 
     public Button getDoneButton() {
         return doneButton;
+    }
+
+    public List<ToggleButton> getListOfToggles() {
+        return listOfToggles;
     }
 }

@@ -104,12 +104,14 @@ public class Controller {
             } else {
                 // Create question card
                 Stage newStage = new Stage();
+                List<ToggleButton> listOfToggles = new ArrayList<>();
                 questionCardModel.getRandomIds(dataBaseIDs);
                 List<String> words = questionCardModel.getWords();
                 QuestionCardView questionCardView = new QuestionCardView(words);
                 questionCardModel.resetCounters();
                 for (int i=0; i<words.size(); i++) {
                     ToggleButton wordToggle = questionCardView.getToggleButtons(words.get(i));
+                    listOfToggles.add(wordToggle);
                     String originalStyle = wordToggle.getStyle();
                     wordToggle.setOnAction((tog) -> {
                         if (wordToggle.isSelected()) {
@@ -141,7 +143,19 @@ public class Controller {
                 gameBoardView.getPlayButton().setDisable(true);
                 newStage.setScene(scene);
                 newStage.setAlwaysOnTop(true);
-                newStage.showAndWait();
+                newStage.show();
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(30000);
+                        for (ToggleButton tog : listOfToggles) {
+                            tog.setDisable(true);
+                            tog.setStyle("-fx-background-color: black ; -fx-background-radius: 5; " +
+                                    "-fx-border-color: black; -fx-border-radius: 5; -fx-text-fill: grey");
+                        }
+                    } catch (InterruptedException ie) {
+                        System.out.println("Interrupted exception: " + ie.getMessage());
+                    }
+                }).start();
             }
         });
     }
@@ -155,7 +169,7 @@ public class Controller {
         playButton.setText("Play");
         listOfPlayers.forEach((el) -> {
             gameBoardView.addMarkers(el);
-            if (el.getPosition()>=(gameBoardPositions.size()-30)){
+            if (el.getPosition()>=(gameBoardPositions.size()-1)){
                 playButton.setText("New\nGame");
                 finishedAlert(el).show();
                 gameBoardModel.setGameFinished(true);
