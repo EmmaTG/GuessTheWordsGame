@@ -2,7 +2,6 @@ package Game.Model;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.GridPane;
 
 import java.util.ArrayList;

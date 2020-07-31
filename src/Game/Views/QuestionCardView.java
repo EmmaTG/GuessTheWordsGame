@@ -1,8 +1,6 @@
 package Game.Views;
 
-import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
-import javafx.concurrent.Worker;
 import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -16,8 +14,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Popup;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -29,7 +25,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class QuestionCardView {
@@ -63,7 +58,15 @@ public class QuestionCardView {
         queryLabel.setStyle("-fx-border-radius:20; -fx-border-color: black; -fx-font-weight: bold; -fx-background-radius: 20");
         queryLabel.setAlignment(Pos.CENTER);
         queryLabel.setPrefWidth(20);
-        new Thread(() -> hoverButton(queryLabel, word)).start();
+
+        Task queryTask = new Task() {
+            @Override
+            protected Object call() throws Exception {
+                hoverButton(queryLabel, word);
+                return null;
+            }
+        };
+        new Thread(queryTask).start();
 
         ToggleButton toggleButton = new ToggleButton(word);
         toggleButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
